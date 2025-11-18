@@ -1,7 +1,7 @@
 # Dependencias para el Proyecto de Reconocimiento de Enfermedades en Papa
 
 # Framework de Deep Learning
-tensorflow
+tensorflow==2.15.0
 
 # Descarga de modelos desde Google Drive
 gdown
@@ -13,7 +13,7 @@ streamlit
 Pillow
 
 # Computación Numérica
-numpy<2.0.0
+numpy==1.26.4
 
 # Visualización de Datos
 matplotlib
@@ -23,5 +23,5 @@ seaborn
 pandas
 scikit-learn
 
-# Nota: Si tienes GPU NVIDIA, puedes instalar tensorflow-gpu en lugar de tensorflow
-# para acelerar el entrenamiento significativamente.
+# Dependencias adicionales para TensorFlow
+protobuf==4.23.4
