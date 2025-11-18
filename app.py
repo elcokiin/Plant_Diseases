@@ -9,6 +9,7 @@ from PIL import Image
 import numpy as np
 import json
 import os
+import urllib.request  # Para descargar desde GitHub
 import gdown  # Para descargar desde Google Drive
 
 # ============================================
@@ -21,27 +22,38 @@ st.set_page_config(
 )
 
 # ============================================
-# DESCARGAR MODELO DESDE GOOGLE DRIVE (SI NO EXISTE)
+# DESCARGAR MODELO DESDE GITHUB O GOOGLE DRIVE
 # ============================================
 def descargar_modelo_si_necesario():
     """
-    Descarga el modelo desde Google Drive si no existe localmente.
+    Descarga el modelo desde GitHub o Google Drive si no existe localmente.
     """
     modelo_path = 'best_potato_model.keras'
     
     if not os.path.exists(modelo_path):
-        st.info("⏳ Descargando modelo desde Google Drive... (esto puede tardar un momento)")
-        
-        # URL de Google Drive
-        gdrive_url = "https://drive.google.com/uc?id=1NB0-US-83eUoajqbb3ea475VIvAZULKY"
+        st.info("⏳ Descargando modelo... (esto puede tardar un momento)")
         
         try:
-            gdown.download(gdrive_url, modelo_path, quiet=False)
-            st.success("✅ Modelo descargado exitosamente")
+            # Intentar descargar desde GitHub primero (más rápido)
+            github_url = "https://github.com/CamiloAT/Plant_Diseases/raw/main/best_potato_model.keras"
+            
+            import urllib.request
+            urllib.request.urlretrieve(github_url, modelo_path)
+            st.success("✅ Modelo descargado exitosamente desde GitHub")
+            
         except Exception as e:
-            st.error(f"❌ Error al descargar el modelo: {str(e)}")
-            st.error("Verifica que el archivo esté compartido públicamente en Google Drive.")
-            st.stop()
+            # Si falla GitHub, intentar Google Drive
+            st.warning(f"No se pudo descargar desde GitHub: {str(e)}")
+            st.info("Intentando descargar desde Google Drive...")
+            
+            try:
+                gdrive_url = "https://drive.google.com/uc?id=1NB0-US-83eUoajqbb3ea475VIvAZULKY"
+                gdown.download(gdrive_url, modelo_path, quiet=False)
+                st.success("✅ Modelo descargado exitosamente desde Google Drive")
+            except Exception as e2:
+                st.error(f"❌ Error al descargar el modelo: {str(e2)}")
+                st.error("Verifica que el archivo esté disponible en GitHub o Google Drive.")
+                st.stop()
     
     return modelo_path
 
@@ -59,7 +71,18 @@ def cargar_modelo_y_metadatos():
     descargar_modelo_si_necesario()
     
     try:
-        modelo = tf.keras.models.load_model('best_potato_model.keras')
+        # Intentar cargar con opciones de compatibilidad
+        modelo = tf.keras.models.load_model(
+            'best_potato_model.keras',
+            compile=False  # No compilar para evitar problemas de compatibilidad
+        )
+        
+        # Recompilar el modelo con la versión actual de TensorFlow
+        modelo.compile(
+            optimizer='adam',
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
         
         # Intentar cargar metadatos si existen
         metadatos = None
@@ -70,7 +93,14 @@ def cargar_modelo_y_metadatos():
         return modelo, metadatos
     except Exception as e:
         st.error(f"❌ Error al cargar el modelo: {str(e)}")
-        st.error("Por favor, asegúrate de que 'best_potato_model.keras' existe en el directorio.")
+        st.error("El modelo puede tener problemas de compatibilidad entre versiones de TensorFlow.")
+        
+        # Mostrar información de depuración
+        with st.expander("🔍 Información de depuración"):
+            st.code(f"Error completo: {str(e)}")
+            st.write(f"Versión de TensorFlow: {tf.__version__}")
+            st.write("Intenta volver a entrenar el modelo con TensorFlow 2.20.0")
+        
         st.stop()
 
 # ============================================
