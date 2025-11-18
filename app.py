@@ -258,7 +258,7 @@ with col1:
     if archivo_subido is not None:
         # Cargar y mostrar imagen original
         imagen = Image.open(archivo_subido)
-        st.image(imagen, caption='Imagen cargada', use_container_width=True)
+        st.image(imagen, caption='Imagen cargada', width='stretch')
         
         # Botón para realizar predicción
         if st.button("🔍 Analizar Hoja de Papa", type="primary", use_container_width=True):
@@ -269,9 +269,9 @@ with col1:
                 # Realizar predicción
                 predicciones = modelo.predict(img_procesada, verbose=0)
                 
-                # Obtener clase predicha y confianza
-                clase_predicha = np.argmax(predicciones[0])
-                confianza = predicciones[0][clase_predicha] * 100
+                # Obtener clase predicha y confianza (convertir a float nativo de Python)
+                clase_predicha = int(np.argmax(predicciones[0]))
+                confianza = float(predicciones[0][clase_predicha] * 100)
                 
                 # Guardar resultados en session_state
                 st.session_state.clase_predicha = clase_predicha
@@ -307,7 +307,7 @@ with col2:
             
             # Barra de confianza
             st.markdown(f"**Confianza:** {st.session_state.confianza:.2f}%")
-            st.progress(st.session_state.confianza / 100)
+            st.progress(float(st.session_state.confianza / 100))
             
             # Interpretación de confianza
             if st.session_state.confianza > 90:
