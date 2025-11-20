@@ -1,0 +1,307 @@
+/* ===== IMPORTAR FUENTE POPPINS ===== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* ===== VARIABLES CSS ===== */
+:root {
+    --primary-color: #4caf50;
+    --primary-dark: #388e3c;
+    --primary-light: #81c784;
+    --secondary-color: #2196f3;
+    --warning-color: #ff9800;
+    --danger-color: #f44336;
+    --success-color: #4caf50;
+    --text-dark: #212121;
+    --text-light: #757575;
+    --bg-light: #f5f5f5;
+    --bg-white: #ffffff;
+    --border-color: #e0e0e0;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== ESTILOS GLOBALES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Background de la app */
+.stApp {
+    background: var(--bg-light);
+}
+
+/* Ocultar elementos de Streamlit por defecto */
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+.stDeployButton {
+    display: none;
+}
+
+/* ===== TÍTULOS ===== */
+h1 {
+    color: var(--text-dark) !important;
+    font-size: 2.2rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+h2 {
+    color: var(--text-dark) !important;
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 1rem !important;
+}
+
+h3 {
+    color: var(--text-dark) !important;
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.8rem !important;
+}
+
+/* ===== CONTENEDORES Y COLUMNAS ===== */
+.stColumn {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.stColumn:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+/* ===== BOTONES ===== */
+.stButton>button {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+.stButton>button:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #2e7d32 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
+.stButton>button:active {
+    transform: translateY(0);
+}
+
+/* ===== FILE UPLOADER ===== */
+.stFileUploader {
+    background: white;
+    border: 2px dashed var(--primary-color);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.stFileUploader:hover {
+    border-color: var(--primary-dark);
+    background: #f1f8e9;
+}
+
+.stFileUploader [data-testid="stFileUploaderDropzone"] {
+    border: none;
+    background: transparent;
+}
+
+/* ===== PROGRESS BAR ===== */
+.stProgress>div>div>div {
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light)) !important;
+    border-radius: 10px;
+}
+
+/* ===== MÉTRICAS ===== */
+.stMetric {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.stMetric [data-testid="stMetricValue"] {
+    color: var(--primary-color) !important;
+    font-size: 1.8rem !important;
+    font-weight: 700 !important;
+}
+
+.stMetric [data-testid="stMetricLabel"] {
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+}
+
+/* ===== MENSAJES DE ESTADO ===== */
+.stSuccess {
+    background: #e8f5e9 !important;
+    border-left: 4px solid var(--success-color) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    color: #1b5e20 !important;
+}
+
+.stWarning {
+    background: #fff8e1 !important;
+    border-left: 4px solid var(--warning-color) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    color: #e65100 !important;
+}
+
+.stError {
+    background: #ffebee !important;
+    border-left: 4px solid var(--danger-color) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    color: #b71c1c !important;
+}
+
+.stInfo {
+    background: #e3f2fd !important;
+    border-left: 4px solid var(--secondary-color) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    color: #0d47a1 !important;
+}
+
+/* ===== IMÁGENES ===== */
+.stImage {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+/* ===== EXPANDERS ===== */
+.streamlit-expanderHeader {
+    background: #f1f8e9 !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    color: var(--text-dark) !important;
+    font-weight: 600 !important;
+    padding: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.streamlit-expanderHeader:hover {
+    background: #e8f5e9 !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* ===== SIDEBAR ===== */
+.css-1d391kg,
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #2d5a27 0%, #1b3a18 100%) !important;
+}
+
+.css-1d391kg .stMarkdown,
+[data-testid="stSidebar"] .stMarkdown {
+    color: white !important;
+}
+
+.css-1d391kg h3,
+[data-testid="stSidebar"] h3 {
+    color: white !important;
+}
+
+/* Botón del sidebar */
+[data-testid="stSidebar"] .stButton>button {
+    background: rgba(76, 175, 80, 0.2) !important;
+    border: 2px solid var(--primary-color) !important;
+    color: white !important;
+}
+
+[data-testid="stSidebar"] .stButton>button:hover {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-light) !important;
+}
+
+/* Métricas en sidebar */
+[data-testid="stSidebar"] .stMetric {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-testid="stSidebar"] .stMetric [data-testid="stMetricValue"] {
+    color: white !important;
+}
+
+[data-testid="stSidebar"] .stMetric [data-testid="stMetricLabel"] {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Expanders en sidebar */
+[data-testid="stSidebar"] .streamlit-expanderHeader {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+[data-testid="stSidebar"] .streamlit-expanderHeader:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ===== MARKDOWN PERSONALIZADO ===== */
+.stMarkdown {
+    color: var(--text-dark);
+}
+
+.stMarkdown a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.stMarkdown a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* ===== SEPARADORES ===== */
+hr {
+    border: none;
+    border-top: 2px solid var(--border-color);
+    margin: 2rem 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8rem !important;
+    }
+
+    h2 {
+        font-size: 1.3rem !important;
+    }
+
+    .stColumn {
+        padding: 1.5rem;
+    }
+
+    .stButton>button {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+}

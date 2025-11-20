@@ -18,9 +18,6 @@ __pycache__/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Streamlit
-.streamlit/
-
 # Dataset temporal (si existe)
 potato_dataset/
 
