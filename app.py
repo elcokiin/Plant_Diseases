@@ -9,8 +9,8 @@ from PIL import Image
 import numpy as np
 import json
 import os
-import urllib.request  # Para descargar desde GitHub
-import gdown  # Para descargar desde Google Drive
+import urllib.request
+import gdown
 
 # ============================================
 # CONFIGURACIÓN DE LA PÁGINA
@@ -18,8 +18,18 @@ import gdown  # Para descargar desde Google Drive
 st.set_page_config(
     page_title="Reconocimiento de Enfermedades en Papa",
     page_icon="🥔",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
+
+# Cargar CSS personalizado
+def load_css():
+    css_file = ".streamlit/style.css"
+    if os.path.exists(css_file):
+        with open(css_file) as f:
+            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    
+load_css()
 
 # ============================================
 # DESCARGAR MODELO DESDE GITHUB O GOOGLE DRIVE
@@ -121,10 +131,10 @@ def cargar_modelo_y_metadatos():
                 loss='categorical_crossentropy',
                 metrics=['accuracy']
             )
-            st.success("✅ Modelo cargado usando método estándar")
+            print("✅ Modelo cargado usando método estándar")
         except Exception as e1:
             # MÉTODO 2: Recrear arquitectura y cargar solo pesos
-            st.warning("⚠️ Usando modo de compatibilidad para cargar el modelo...")
+            print("⚠️ Usando modo de compatibilidad para cargar el modelo...")
             
             # Crear arquitectura desde cero
             modelo = crear_modelo(num_classes=3, img_size=224)
@@ -133,11 +143,10 @@ def cargar_modelo_y_metadatos():
             try:
                 modelo_temp = tf.keras.models.load_model(modelo_path, compile=False)
                 modelo.set_weights(modelo_temp.get_weights())
-                st.success("✅ Pesos del modelo cargados exitosamente")
+                print("✅ Pesos del modelo cargados exitosamente")
             except Exception as e2:
-                st.error(f"❌ No se pudieron cargar los pesos: {str(e2)}")
-                st.info("🔄 Usando modelo con pesos de ImageNet (sin entrenamiento específico)")
-                # El modelo ya tiene pesos de ImageNet en la base
+                print(f"❌ No se pudieron cargar los pesos: {str(e2)}")
+                print("🔄 Usando modelo con pesos de ImageNet (sin entrenamiento específico)")
         
         # Intentar cargar metadatos si existen
         metadatos = None
@@ -199,22 +208,6 @@ st.title("🥔 Reconocimiento de Enfermedades en Papa")
 st.markdown("### Sistema de Clasificación Automática usando Deep Learning")
 st.markdown("---")
 
-# Información del proyecto
-with st.expander("ℹ️ Acerca de este proyecto"):
-    st.write("""
-    **Proyecto Universitario de Machine Learning**
-    
-    Este sistema utiliza una Red Neuronal Convolucional (CNN) con Transfer Learning (MobileNetV2) 
-    entrenada con el dataset PlantVillage para detectar enfermedades en hojas de papa.
-    
-    **Características:**
-    - 🧠 Modelo: CNN con Transfer Learning (MobileNetV2)
-    - 📊 Dataset: PlantVillage - Potato Disease Dataset
-    - 🎯 Clases: Enfermedades comunes en plantas de papa
-    - 🖼️ Entrada: Imágenes de 224x224 píxeles
-    - 📈 Técnicas: Data Augmentation, Fine-tuning, Class Weighting
-    """)
-
 # Cargar modelo y metadatos
 modelo, metadatos = cargar_modelo_y_metadatos()
 
@@ -227,20 +220,12 @@ if metadatos:
     # Invertir el diccionario para obtener nombre por índice
     CLASES_ENFERMEDADES = {v: k for k, v in class_indices.items()}
     
-    st.success(f"✅ Modelo cargado exitosamente - Accuracy: {test_accuracy:.2f}%")
-    
-    if 'class_distribution' in metadatos:
-        with st.expander("📊 Información del Dataset"):
-            st.write(f"**Total de clases:** {num_clases}")
-            st.write(f"**Imágenes de entrenamiento:** {metadatos.get('total_train_samples', 'N/A')}")
-            st.write(f"**Imágenes de prueba:** {metadatos.get('total_test_samples', 'N/A')}")
-            st.write(f"**Precisión del modelo:** {metadatos.get('test_precision', 0) * 100:.2f}%")
-            st.write(f"**Recall del modelo:** {metadatos.get('test_recall', 0) * 100:.2f}%")
-            st.write(f"**F1-Score:** {metadatos.get('f1_score', 0) * 100:.2f}%")
+    # Log en consola en lugar de mostrar en pantalla
+    print(f"✅ Modelo cargado exitosamente - Accuracy: {test_accuracy:.2f}%")
 else:
     img_size = 224
     CLASES_ENFERMEDADES = {}
-    st.warning("⚠️ Modelo cargado sin metadatos. Algunas funciones pueden estar limitadas.")
+    print("⚠️ Modelo cargado sin metadatos")
 
 # Crear dos columnas
 col1, col2 = st.columns([1, 1])
@@ -373,85 +358,109 @@ with col2:
         st.info("👆 Carga una imagen y presiona 'Analizar' para ver los resultados")
 
 # ============================================
-# SECCIÓN ADICIONAL: LISTA DE ENFERMEDADES
+# BOTÓN FLOTANTE CON INFORMACIÓN (SIDEBAR)
 # ============================================
-st.markdown("---")
-st.subheader("📋 Enfermedades Reconocidas por el Sistema")
 
-if CLASES_ENFERMEDADES:
-    with st.expander(f"Ver todas las clases ({len(CLASES_ENFERMEDADES)})"):
-        # Mostrar en 2 columnas
-        cols = st.columns(2)
+# Estado para controlar la visualización del sidebar
+if 'show_info' not in st.session_state:
+    st.session_state.show_info = False
+
+# Botón flotante en el sidebar
+with st.sidebar:
+    st.markdown("### 📋 Información del Sistema")
+    if st.button("ℹ️ Ver Detalles del Modelo", key="info_button", use_container_width=True):
+        st.session_state.show_info = not st.session_state.show_info
+
+# Mostrar información si el botón está activo
+if st.session_state.show_info:
+    with st.sidebar:
+        st.markdown("---")
         
-        for idx, nombre in CLASES_ENFERMEDADES.items():
-            col_idx = idx % 2
-            with cols[col_idx]:
+        # Métricas del modelo
+        if metadatos:
+            st.markdown("### 📊 Métricas del Modelo")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Accuracy", f"{metadatos.get('test_accuracy', 0) * 100:.2f}%")
+                st.metric("Precision", f"{metadatos.get('test_precision', 0) * 100:.2f}%")
+            with col2:
+                st.metric("Recall", f"{metadatos.get('test_recall', 0) * 100:.2f}%")
+                st.metric("F1-Score", f"{metadatos.get('f1_score', 0) * 100:.2f}%")
+            
+            st.markdown("---")
+        
+        # Acerca del proyecto
+        st.markdown("### ℹ️ Acerca del Proyecto")
+        st.markdown("""
+        **Proyecto Universitario de Machine Learning**
+        
+        Sistema de CNN con Transfer Learning (MobileNetV2) 
+        entrenado con el dataset PlantVillage.
+        
+        **Características:**
+        - 🧠 Modelo: MobileNetV2
+        - 📊 Dataset: PlantVillage
+        - 🎯 Clases: 3 tipos de hojas de papa
+        - 🖼️ Entrada: 224x224 píxeles
+        - 📈 Técnicas: Data Augmentation, Fine-tuning
+        """)
+        
+        st.markdown("---")
+        
+        # Información sobre enfermedades
+        st.markdown("### 📚 Enfermedades Comunes en Papa")
+        
+        with st.expander("🦠 Tizón Temprano (Early Blight)"):
+            st.markdown("""
+            **Causado por:** *Alternaria solani*
+            
+            **Síntomas:**
+            - Manchas circulares concéntricas en las hojas
+            - Color marrón oscuro
+            - Afecta principalmente hojas más viejas
+            
+            **Control:**
+            - Fungicidas a base de cobre
+            - Rotación de cultivos
+            - Eliminación de residuos vegetales
+            """)
+        
+        with st.expander("🦠 Tizón Tardío (Late Blight)"):
+            st.markdown("""
+            **Causado por:** *Phytophthora infestans*
+            
+            **Síntomas:**
+            - Manchas irregulares de color verde oscuro a negro
+            - Moho blanco en el envés de las hojas
+            - Propagación rápida en condiciones húmedas
+            
+            **Control:**
+            - Fungicidas sistémicos
+            - Mejorar drenaje
+            - Plantar variedades resistentes
+            - Evitar riego por aspersión
+            """)
+        
+        with st.expander("✅ Planta Saludable (Healthy)"):
+            st.markdown("""
+            **Características:**
+            - Hojas verdes uniformes
+            - Sin manchas ni decoloraciones
+            - Crecimiento vigoroso
+            
+            **Mantenimiento:**
+            - Riego adecuado
+            - Fertilización balanceada
+            - Monitoreo regular
+            - Buena ventilación
+            """)
+        
+        # Lista de clases reconocidas
+        st.markdown("---")
+        st.markdown("### 📋 Clases Reconocidas")
+        if CLASES_ENFERMEDADES:
+            for idx, nombre in CLASES_ENFERMEDADES.items():
                 if 'healthy' in nombre.lower():
                     st.markdown(f"✅ **{idx}.** {nombre}")
                 else:
                     st.markdown(f"🦠 **{idx}.** {nombre}")
-else:
-    st.info("ℹ️ Información de clases no disponible. Carga el archivo 'model_metadata.json' para ver las clases.")
-
-# ============================================
-# INFORMACIÓN ADICIONAL
-# ============================================
-st.markdown("---")
-st.subheader("📚 Información sobre Enfermedades Comunes en Papa")
-
-with st.expander("🦠 Tizón Temprano (Early Blight)"):
-    st.write("""
-    **Causado por:** Alternaria solani
-    
-    **Síntomas:**
-    - Manchas circulares concéntricas en las hojas
-    - Color marrón oscuro
-    - Afecta principalmente hojas más viejas
-    
-    **Control:**
-    - Fungicidas a base de cobre
-    - Rotación de cultivos
-    - Eliminación de residuos vegetales
-    """)
-
-with st.expander("🦠 Tizón Tardío (Late Blight)"):
-    st.write("""
-    **Causado por:** Phytophthora infestans
-    
-    **Síntomas:**
-    - Manchas irregulares de color verde oscuro a negro
-    - Moho blanco en el envés de las hojas
-    - Propagación rápida en condiciones húmedas
-    
-    **Control:**
-    - Fungicidas sistémicos
-    - Mejorar drenaje
-    - Plantar variedades resistentes
-    - Evitar riego por aspersión
-    """)
-
-with st.expander("✅ Planta Saludable (Healthy)"):
-    st.write("""
-    **Características:**
-    - Hojas verdes uniformes
-    - Sin manchas ni decoloraciones
-    - Crecimiento vigoroso
-    
-    **Mantenimiento:**
-    - Riego adecuado
-    - Fertilización balanceada
-    - Monitoreo regular
-    - Buena ventilación
-    """)
-
-# ============================================
-# PIE DE PÁGINA
-# ============================================
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #666;'>
-    <p>🥔 Desarrollado con ❤️ usando TensorFlow, MobileNetV2 y Streamlit</p>
-    <p>Proyecto Universitario - Inteligencia Computacional - 2025</p>
-    <p>Dataset: PlantVillage - Potato Disease Classification</p>
-</div>
-""", unsafe_allow_html=True)
