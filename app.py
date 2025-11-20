@@ -333,36 +333,6 @@ with col2:
                 nombre = f"Clase {idx}"
             
             st.markdown(f"{i}. **{nombre}** - `{probabilidad:.1f}%`")
-        
-        # Recomendaciones (solo si la confianza es >= 60%)
-        if st.session_state.confianza >= 60:
-            st.markdown("---")
-            st.markdown("**Recomendaciones**")
-            
-            if 'healthy' in nombre_enfermedad.lower():
-                st.info("""
-                **Planta Saludable**
-                - Continuar con las prácticas de cuidado actuales
-                - Mantener monitoreo regular
-                - Asegurar buena ventilación y riego adecuado
-                """)
-            elif 'early blight' in nombre_enfermedad.lower():
-                st.warning("""
-                **Tizón Temprano Detectado**
-                - Aplicar fungicidas a base de cobre
-                - Mejorar la circulación de aire
-                - Evitar riego por aspersión
-                - Eliminar hojas afectadas
-                """)
-            elif 'late blight' in nombre_enfermedad.lower():
-                st.error("""
-                **Tizón Tardío Detectado - Acción Urgente**
-                - Aplicar fungicidas sistémicos inmediatamente
-                - Aislar plantas afectadas
-                - Mejorar drenaje del suelo
-                - Consultar con un agrónomo
-                """)
-    
     else:
         st.info("Carga una imagen y presiona 'Analizar Imagen' para ver los resultados")
 
