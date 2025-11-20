@@ -205,7 +205,6 @@ def preprocesar_imagen(imagen, img_size=224):
 
 # Título y descripción
 st.title("🌿 Detección de Enfermedades en Papa")
-st.markdown("Sistema de Clasificación Automática usando Deep Learning")
 st.markdown("---")
 
 # Cargar modelo y metadatos
@@ -292,12 +291,31 @@ with col2:
             st.progress(float(st.session_state.confianza / 100))
             
             # Interpretación de confianza
-            if st.session_state.confianza > 90:
-                st.success("Predicción muy confiable")
+            if st.session_state.confianza < 60:
+                st.error("""
+                **⚠️ Imagen no reconocida o confianza muy baja**
+                
+                El modelo no puede identificar con certeza esta imagen. Esto puede deberse a:
+                
+                - La imagen no corresponde a una hoja de papa
+                - La imagen tiene baja calidad o está borrosa
+                - La hoja está muy alejada o muy cerca
+                - Hay múltiples objetos en la imagen
+                
+                **Recomendaciones para mejorar la detección:**
+                - Use una imagen clara y enfocada
+                - Capture **solamente la hoja de papa** afectada
+                - Asegure buena iluminación natural
+                - Evite sombras y reflejos
+                - La hoja debe ocupar la mayor parte de la imagen
+                - Fondo uniforme (cielo, papel blanco, etc.)
+                """)
+            elif st.session_state.confianza > 90:
+                st.success("**Predicción muy confiable**")
             elif st.session_state.confianza > 70:
-                st.info("Predicción confiable")
+                st.info("**Predicción confiable**")
             else:
-                st.warning("Predicción con baja confianza - Verificar con un experto")
+                st.warning("**Predicción con confianza media - Se recomienda verificar con un experto**")
         
         st.markdown("---")
         
@@ -316,33 +334,34 @@ with col2:
             
             st.markdown(f"{i}. **{nombre}** - `{probabilidad:.1f}%`")
         
-        # Recomendaciones
-        st.markdown("---")
-        st.markdown("**Recomendaciones**")
-        
-        if 'healthy' in nombre_enfermedad.lower():
-            st.info("""
-            **Planta Saludable**
-            - Continuar con las prácticas de cuidado actuales
-            - Mantener monitoreo regular
-            - Asegurar buena ventilación y riego adecuado
-            """)
-        elif 'early blight' in nombre_enfermedad.lower():
-            st.warning("""
-            **Tizón Temprano Detectado**
-            - Aplicar fungicidas a base de cobre
-            - Mejorar la circulación de aire
-            - Evitar riego por aspersión
-            - Eliminar hojas afectadas
-            """)
-        elif 'late blight' in nombre_enfermedad.lower():
-            st.error("""
-            **Tizón Tardío Detectado - Acción Urgente**
-            - Aplicar fungicidas sistémicos inmediatamente
-            - Aislar plantas afectadas
-            - Mejorar drenaje del suelo
-            - Consultar con un agrónomo
-            """)
+        # Recomendaciones (solo si la confianza es >= 60%)
+        if st.session_state.confianza >= 60:
+            st.markdown("---")
+            st.markdown("**Recomendaciones**")
+            
+            if 'healthy' in nombre_enfermedad.lower():
+                st.info("""
+                **Planta Saludable**
+                - Continuar con las prácticas de cuidado actuales
+                - Mantener monitoreo regular
+                - Asegurar buena ventilación y riego adecuado
+                """)
+            elif 'early blight' in nombre_enfermedad.lower():
+                st.warning("""
+                **Tizón Temprano Detectado**
+                - Aplicar fungicidas a base de cobre
+                - Mejorar la circulación de aire
+                - Evitar riego por aspersión
+                - Eliminar hojas afectadas
+                """)
+            elif 'late blight' in nombre_enfermedad.lower():
+                st.error("""
+                **Tizón Tardío Detectado - Acción Urgente**
+                - Aplicar fungicidas sistémicos inmediatamente
+                - Aislar plantas afectadas
+                - Mejorar drenaje del suelo
+                - Consultar con un agrónomo
+                """)
     
     else:
         st.info("Carga una imagen y presiona 'Analizar Imagen' para ver los resultados")
@@ -471,11 +490,11 @@ with tab3:
         universitario para la materia 
         de Inteligencia Computacional.
         
-        **🎯 Objetivo**
+        **Objetivo**
         
         Proporcionar una herramienta 
         de diagnóstico rápido y 
         accesible para agricultores.
         
-        **📅 Año:** 2025
+        **Año:** 2025
         """)
