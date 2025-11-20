@@ -190,7 +190,9 @@ h3 {
     color: #212121 !important;
 }
 
-.stMarkdown h3, .stMarkdown h4, .stMarkdown h5 {
+.stMarkdown h3,
+.stMarkdown h4,
+.stMarkdown h5 {
     color: #212121 !important;
 }
 
